@@ -39,60 +39,43 @@ activities = {
         "max_participants": 30,
         "participants": ["john@mergington.edu", "olivia@mergington.edu"]
     },
-    # New sports activities
     "Basketball Team": {
-        "description": "Practice basketball skills and compete in school games",
-        "schedule": "Tuesdays and Thursdays, 4:00 PM - 5:30 PM",
+        "description": "Competitive basketball training and games",
+        "schedule": "Tuesdays and Thursdays, 4:00 PM - 6:00 PM",
         "max_participants": 15,
         "participants": []
     },
-    "Soccer Club": {
-        "description": "Train for soccer matches and improve teamwork",
-        "schedule": "Wednesdays and Fridays, 3:00 PM - 4:30 PM",
-        "max_participants": 22,
+    "Swimming Club": {
+        "description": "Swimming training and water sports",
+        "schedule": "Mondays and Wednesdays, 3:30 PM - 5:00 PM",
+        "max_participants": 20,
         "participants": []
     },
-    # New artistic activities
-    "Art Club": {
-        "description": "Explore painting, drawing, and creative expression",
-        "schedule": "Mondays, 3:30 PM - 5:00 PM",
-        "max_participants": 18,
+    "Art Studio": {
+        "description": "Express creativity through painting and drawing",
+        "schedule": "Wednesdays, 3:30 PM - 5:00 PM",
+        "max_participants": 15,
         "participants": []
     },
-    "Music Club": {
-        "description": "Learn instruments and perform in school concerts",
-        "schedule": "Tuesdays, 3:00 PM - 4:30 PM",
+    "Drama Club": {
+        "description": "Theater arts and performance training",
+        "schedule": "Tuesdays, 4:00 PM - 6:00 PM",
         "max_participants": 25,
         "participants": []
     },
-    # New intellectual activities
-    "Debate Club": {
-        "description": "Develop public speaking and argumentation skills",
-        "schedule": "Thursdays, 4:00 PM - 5:30 PM",
+    "Debate Team": {
+        "description": "Learn public speaking and argumentation skills",
+        "schedule": "Thursdays, 3:30 PM - 5:00 PM",
         "max_participants": 16,
         "participants": []
     },
     "Science Club": {
-        "description": "Conduct experiments and explore scientific concepts",
-        "schedule": "Fridays, 2:00 PM - 3:30 PM",
+        "description": "Hands-on experiments and scientific exploration",
+        "schedule": "Fridays, 3:30 PM - 5:00 PM",
         "max_participants": 20,
         "participants": []
     }
 }
-    "Programming Class": {
-        "description": "Learn programming fundamentals and build software projects",
-        "schedule": "Tuesdays and Thursdays, 3:30 PM - 4:30 PM",
-        "max_participants": 20,
-        "participants": ["emma@mergington.edu", "sophia@mergington.edu"]
-    },
-    "Gym Class": {
-        "description": "Physical education and sports activities",
-        "schedule": "Mondays, Wednesdays, Fridays, 2:00 PM - 3:00 PM",
-        "max_participants": 30,
-        "participants": ["john@mergington.edu", "olivia@mergington.edu"]
-    }
-}
-
 
 @app.get("/")
 def root():
@@ -121,3 +104,18 @@ def signup_for_activity(activity_name: str, email: str):
     # Add student
     activity["participants"].append(email)
     return {"message": f"Signed up {email} for {activity_name}"}
+
+
+# Remove a participant from an activity
+from fastapi import Query
+
+@app.delete("/activities/{activity_name}/participant")
+def remove_participant(activity_name: str, email: str = Query(...)):
+    """Remove a student from an activity"""
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    activity = activities[activity_name]
+    if email not in activity["participants"]:
+        raise HTTPException(status_code=404, detail="Participant not found in this activity")
+    activity["participants"].remove(email)
+    return {"message": f"Removed {email} from {activity_name}"}
